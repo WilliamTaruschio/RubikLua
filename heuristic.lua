@@ -12,9 +12,9 @@ function Cube:create( cube)
   -- se non ne viene fornita una
   self.cube= cube or {}
   setmetatable(self.cube,self)
-  self.__index = self.cube
+  self.__index = self
   -- body
-  return self
+  return self.cube
 end
 
 cuboIniziale=Cube:create()
@@ -23,11 +23,11 @@ cuboFinale = Cube:create()
 
 function Cube:initialize()
   for i = -1, 1, 1 do
-   self.cube[i] = {} -- create a new row
+   self[i] = {} -- create a new row
     for j = -1, 1, 1 do
-      self.cube[i][j] = {}
+      self[i][j] = {}
       for k = -1, 1, 1 do
-        self.cube[i][j][k] = {}
+        self[i][j][k] = {}
       end
     end
   end
@@ -41,72 +41,72 @@ cuboFinale:initialize()
 ----------------------------------------------------------
 
 -- definizione cuboIniziale.cubetti, associazione coordinate-etichetta
-cuboIniziale.cube[-1][-1][-1] = "WGR"
-cuboIniziale.cube[-1][-1][0] = "GR"
-cuboIniziale.cube[-1][-1][1] = "YGR"
-cuboIniziale.cube[-1][0][-1] = "WR"
-cuboIniziale.cube[-1][0][0] = "0"
-cuboIniziale.cube[-1][0][1] = "YR"
-cuboIniziale.cube[-1][1][-1] = "WBR"
-cuboIniziale.cube[-1][1][0] = "BR"
-cuboIniziale.cube[-1][1][1] = "YRB"
+cuboIniziale[-1][-1][-1] = "WGR"
+cuboIniziale[-1][-1][0] = "GR"
+cuboIniziale[-1][-1][1] = "YGR"
+cuboIniziale[-1][0][-1] = "WR"
+cuboIniziale[-1][0][0] = "0"
+cuboIniziale[-1][0][1] = "YR"
+cuboIniziale[-1][1][-1] = "WBR"
+cuboIniziale[-1][1][0] = "BR"
+cuboIniziale[-1][1][1] = "YRB"
 
-cuboIniziale.cube[0][-1][-1] = "WG"
-cuboIniziale.cube[0][-1][0] = "0"
-cuboIniziale.cube[0][-1][1] = "YG"
-cuboIniziale.cube[0][0][-1] = "0"
-cuboIniziale.cube[0][0][0] = "0"
-cuboIniziale.cube[0][0][1] = "0"
-cuboIniziale.cube[0][1][-1] = "WB"
-cuboIniziale.cube[0][1][0] = "0"
-cuboIniziale.cube[0][1][1] = "YB"
+cuboIniziale[0][-1][-1] = "WG"
+cuboIniziale[0][-1][0] = "0"
+cuboIniziale[0][-1][1] = "YG"
+cuboIniziale[0][0][-1] = "0"
+cuboIniziale[0][0][0] = "0"
+cuboIniziale[0][0][1] = "0"
+cuboIniziale[0][1][-1] = "WB"
+cuboIniziale[0][1][0] = "0"
+cuboIniziale[0][1][1] = "YB"
 
-cuboIniziale.cube[1][-1][-1] = "WOG"
-cuboIniziale.cube[1][-1][0] = "GO"
-cuboIniziale.cube[1][-1][1] = "YGO"
-cuboIniziale.cube[1][0][-1] = "WO"
-cuboIniziale.cube[1][0][0] = "0"
-cuboIniziale.cube[1][0][1] = "YO"
-cuboIniziale.cube[1][1][-1] = "WBO"
-cuboIniziale.cube[1][1][0] = "BO"
-cuboIniziale.cube[1][1][1] = "YBO"
+cuboIniziale[1][-1][-1] = "WOG"
+cuboIniziale[1][-1][0] = "GO"
+cuboIniziale[1][-1][1] = "YGO"
+cuboIniziale[1][0][-1] = "WO"
+cuboIniziale[1][0][0] = "0"
+cuboIniziale[1][0][1] = "YO"
+cuboIniziale[1][1][-1] = "WBO"
+cuboIniziale[1][1][0] = "BO"
+cuboIniziale[1][1][1] = "YBO"
 
-cuboStronzo.cube=cuboIniziale.cube
+
 --Genero il cubo per il confronto
 
 ----------------------------------------------------------
 -- CUBO NELLA CONFIGURAZIONE FINALE
 ----------------------------------------------------------
 
-cuboFinale.cube[-1][-1][-1] = "WGR"
-cuboFinale.cube[-1][-1][0] = "GR"
-cuboFinale.cube[-1][-1][1] = "YGR"
-cuboFinale.cube[-1][0][-1] = "WR"
-cuboFinale.cube[-1][0][0] = "0"
-cuboFinale.cube[-1][0][1] = "YR"
-cuboFinale.cube[-1][1][-1] = "WBR"
-cuboFinale.cube[-1][1][0] = "BR"
-cuboFinale.cube[-1][1][1] = "YRB"
+cuboFinale[-1][-1][-1] = "WGR"
+cuboFinale[-1][-1][0] = "GR"
+cuboFinale[-1][-1][1] = "YGR"
+cuboFinale[-1][0][-1] = "WR"
+cuboFinale[-1][0][0] = "0"
+cuboFinale[-1][0][1] = "YR"
+cuboFinale[-1][1][-1] = "WBR"
+cuboFinale[-1][1][0] = "BR"
+cuboFinale[-1][1][1] = "YRB"
 
-cuboFinale.cube[0][-1][-1] = "WG"
-cuboFinale.cube[0][-1][0] = "0"
-cuboFinale.cube[0][-1][1] = "YG"
-cuboFinale.cube[0][0][-1] = "0"
-cuboFinale.cube[0][0][0] = "0"
-cuboFinale.cube[0][0][1] = "0"
-cuboFinale.cube[0][1][-1] = "WB"
-cuboFinale.cube[0][1][0] = "0"
-cuboFinale.cube[0][1][1] = "YB"
+cuboFinale[0][-1][-1] = "WG"
+cuboFinale[0][-1][0] = "0"
+cuboFinale[0][-1][1] = "YG"
+cuboFinale[0][0][-1] = "0"
+cuboFinale[0][0][0] = "0"
+cuboFinale[0][0][1] = "0"
+cuboFinale[0][1][-1] = "WB"
+cuboFinale[0][1][0] = "0"
+cuboFinale[0][1][1] = "YB"
 
-cuboFinale.cube[1][-1][-1] = "WOG"
-cuboFinale.cube[1][-1][0] = "GO"
-cuboFinale.cube[1][-1][1] = "YGO"
-cuboFinale.cube[1][0][-1] = "WO"
-cuboFinale.cube[1][0][0] = "0"
-cuboFinale.cube[1][0][1] = "YO"
-cuboFinale.cube[1][1][-1] = "WBO"
-cuboFinale.cube[1][1][0] = "BO"
-cuboFinale.cube[1][1][1] = "YBO"
+cuboFinale[1][-1][-1] = "WOG"
+cuboFinale[1][-1][0] = "GO"
+cuboFinale[1][-1][1] = "YGO"
+cuboFinale[1][0][-1] = "WO"
+cuboFinale[1][0][0] = "0"
+cuboFinale[1][0][1] = "YO"
+cuboFinale[1][1][-1] = "WBO"
+cuboFinale[1][1][0] = "BO"
+cuboFinale[1][1][1] = "YBO"
 
 ----------------------------------------------------
 -- CONTROLLA I DUE CUBI
