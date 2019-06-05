@@ -4,26 +4,23 @@ tramite assi cartesiani x,y,z con valore ammessi -1,0,1
 lista 
 ]] --
 
-
-
-Cube={}
-function Cube:create( cube)
+Cube = {}
+function Cube:create(cube)
   -- creazione nuova tabella
   -- se non ne viene fornita una
-  self.cube= cube or {}
-  setmetatable(self.cube,self)
+  self.cube = cube or {}
+  setmetatable(self.cube, self)
   self.__index = self
   -- body
   return self.cube
 end
 
-cuboIniziale=Cube:create()
+cuboIniziale = Cube:create()
 cuboFinale = Cube:create()
---cuboStronzo=Cube:create()
 
 function Cube:initialize()
   for i = -1, 1, 1 do
-   self[i] = {} -- create a new row
+    self[i] = {} -- create a new row
     for j = -1, 1, 1 do
       self[i][j] = {}
       for k = -1, 1, 1 do
@@ -34,13 +31,22 @@ function Cube:initialize()
 end
 cuboIniziale:initialize()
 cuboFinale:initialize()
---cuboStronzo:initialize()
 
+function Cube:replace(cube)
+  for i = -1, 1 do
+    for j = -1, 1 do
+      for z = -1, 1 do
+        self[i][j][z] = cube[i][j][z]
+      end
+    end
+  end
+  return self
+end
 ----------------------------------------------------------
 -- CUBO NORMALE IN CUI SI EFFETTUANO LE OPERAZIONI
 ----------------------------------------------------------
 
--- definizione cuboIniziale.cubetti, associazione coordinate-etichetta
+-- definizione cuboInizialetti, associazione coordinate-etichetta
 cuboIniziale[-1][-1][-1] = "WGR"
 cuboIniziale[-1][-1][0] = "GR"
 cuboIniziale[-1][-1][1] = "YGR"
@@ -70,7 +76,6 @@ cuboIniziale[1][0][1] = "YO"
 cuboIniziale[1][1][-1] = "WBO"
 cuboIniziale[1][1][0] = "BO"
 cuboIniziale[1][1][1] = "YBO"
-
 
 --Genero il cubo per il confronto
 
@@ -117,7 +122,7 @@ function Cube:cubeControl()
     ok = true
     for j = -1, 1 do
       for z = -1, 1 do
-        if (cuboIniziale.cube[i][j][z] ~= cuboFinale.cube[i][j][z]) then
+        if (cuboIniziale[i][j][z] ~= cuboFinale[i][j][z]) then
           ok = false
         end
       end
@@ -125,14 +130,13 @@ function Cube:cubeControl()
   end
   return ok
 end
-
 
 function control(cubo1, cubo2)
   for i = -1, 1 do
     ok = true
     for j = -1, 1 do
       for z = -1, 1 do
-        if (cubo1.cube[i][j][z] ~= cubo2.cube[i][j][z]) then
+        if (cubo1[i][j][z] ~= cubo2[i][j][z]) then
           ok = false
         end
       end
@@ -140,7 +144,7 @@ function control(cubo1, cubo2)
   end
   return ok
 end
---print(cuboIniziale.cubeControl())
+--print(cuboInizialeControl())
 
 -------------------------------------------------------
 --Metodi per trovare gli indici X Y Z
@@ -150,7 +154,7 @@ function findIndexX(nome, Cube)
   for i = -1, 1 do
     for j = -1, 1 do
       for z = -1, 1 do
-        if (Cube.cube[i][j][z] == nome) then
+        if (Cube[i][j][z] == nome) then
           return i
         end
       end
@@ -161,7 +165,7 @@ function findIndexY(nome, Cube)
   for i = -1, 1 do
     for j = -1, 1 do
       for z = -1, 1 do
-        if (Cube.cube[i][j][z] == nome) then
+        if (Cube[i][j][z] == nome) then
           return j
         end
       end
@@ -172,7 +176,7 @@ function findIndexZ(nome, Cube)
   for i = -1, 1 do
     for j = -1, 1 do
       for z = -1, 1 do
-        if (Cube.cube[i][j][z] == nome) then
+        if (Cube[i][j][z] == nome) then
           return z
         end
       end
@@ -180,179 +184,224 @@ function findIndexZ(nome, Cube)
   end
 end
 
-
 ------------------------------------------------------------
 
 -- INIZIO DESCRIZIONE MOSSE
 
 -----------------------------------------------------------
 
- mosse = {}
+function Cube:mosse()
+  local cubi = {}
+  for i = 1, 12 do
+    cubi[i] = Cube:create()
+    cubi[i]:initialize()
+    cubi[i]:replace(self)
+  end
+
+  cubi[1]:destraOrario()
+
+  cubi[2]:destraAntiOrario()
+
+  cubi[3]:sinistraOrario()
+
+  cubi[4]:sinistraAntiOrario()
+
+  cubi[5]:fronteOrario()
+
+  cubi[6]:fronteAntiOrario()
+
+  cubi[7]:downOrario()
+
+  cubi[8]:downAntiOrario()
+
+  cubi[9]:backOrario()
+
+  cubi[10]:backAntiOrario()
+
+  cubi[11]:upOrario()
+
+  cubi[12]:upAntiOrario()
+
+  return cubi
+end
+
 function Cube:destraOrario() --permutazione destra orario
   --permutazione angoli
-  appoggio = self.cube[1][1][1]
-  self.cube[1][1][1] = self.cube[1][1][-1]
-  self.cube[1][1][-1] = self.cube[-1][1][-1]
-  self.cube[-1][1][-1] = self.cube[-1][1][1]
-  self.cube[-1][1][1] = appoggio
+  appoggio = self[1][1][1]
+  self[1][1][1] = self[1][1][-1]
+  self[1][1][-1] = self[-1][1][-1]
+  self[-1][1][-1] = self[-1][1][1]
+  self[-1][1][1] = appoggio
   --permutazione spigoli
-  appoggio = self.cube[0][1][1]
-  self.cube[0][1][1] = self.cube[1][1][0]
-  self.cube[1][1][0] = self.cube[0][1][-1]
-  self.cube[0][1][-1] = self.cube[-1][1][0]
-  self.cube[-1][1][0] = appoggio
+  appoggio = self[0][1][1]
+  self[0][1][1] = self[1][1][0]
+  self[1][1][0] = self[0][1][-1]
+  self[0][1][-1] = self[-1][1][0]
+  self[-1][1][0] = appoggio
   print("mossa")
+  return self
+end
 
-end
-function mosse.destraAntiOrario(cuboIniziale) --permutazione destra orario
+function Cube:destraAntiOrario() --permutazione  orariodestra
   --permutazione angoli
-  appoggio = cuboIniziale.cube[1][1][1]
-  cuboIniziale.cube[1][1][1] = cuboIniziale.cube[-1][1][1]
-  cuboIniziale.cube[-1][1][1] = cuboIniziale.cube[-1][1][-1]
-  cuboIniziale.cube[-1][1][-1] = cuboIniziale.cube[1][1][-1]
-  cuboIniziale.cube[1][1][-1] = appoggio
+  appoggio = self[1][1][1]
+  self[1][1][1] = self[-1][1][1]
+  self[-1][1][1] = self[-1][1][-1]
+  self[-1][1][-1] = self[1][1][-1]
+  self[1][1][-1] = appoggio
   --permutazione spigoli
-  appoggio = cuboIniziale.cube[0][1][1]
-  cuboIniziale.cube[0][1][1] = cuboIniziale.cube[-1][1][0]
-  cuboIniziale.cube[-1][1][0] = cuboIniziale.cube[0][1][-1]
-  cuboIniziale.cube[0][1][-1] = cuboIniziale.cube[1][1][0]
-  cuboIniziale.cube[1][1][0] = appoggio
+  appoggio = self[0][1][1]
+  self[0][1][1] = self[-1][1][0]
+  self[-1][1][0] = self[0][1][-1]
+  self[0][1][-1] = self[1][1][0]
+  self[1][1][0] = appoggio
+  return self
 end
-function mosse.sinistraOrario(cuboIniziale) --permutazione sinistra orario
+function Cube:sinistraOrario() --permutazione sinistra orario
   --permutazione angoli
-  appoggio = cuboIniziale.cube[1][-1][1]
-  cuboIniziale.cube[1][-1][1] = cuboIniziale.cube[-1][-1][1]
-  cuboIniziale.cube[-1][-1][1] = cuboIniziale.cube[-1][-1][-1]
-  cuboIniziale.cube[-1][-1][-1] = cuboIniziale.cube[1][-1][-1]
-  cuboIniziale.cube[1][-1][-1] = appoggio
+  appoggio = self[1][-1][1]
+  self[1][-1][1] = self[-1][-1][1]
+  self[-1][-1][1] = self[-1][-1][-1]
+  self[-1][-1][-1] = self[1][-1][-1]
+  self[1][-1][-1] = appoggio
   --permutazione spigoli
-  appoggio = cuboIniziale.cube[0][-1][1]
-  cuboIniziale.cube[0][-1][1] = cuboIniziale.cube[-1][-1][0]
-  cuboIniziale.cube[-1][-1][0] = cuboIniziale.cube[0][-1][-1]
-  cuboIniziale.cube[0][-1][-1] = cuboIniziale.cube[1][-1][0]
-  cuboIniziale.cube[1][-1][0] = appoggio
+  appoggio = self[0][-1][1]
+  self[0][-1][1] = self[-1][-1][0]
+  self[-1][-1][0] = self[0][-1][-1]
+  self[0][-1][-1] = self[1][-1][0]
+  self[1][-1][0] = appoggio
+  return self
 end
-function mosse.sinistraAntiOrario(cuboIniziale) --permutazione sinistra orario
+function Cube:sinistraAntiOrario() --permutazione sinistra orario
   --permutazione angoli
-  appoggio = cuboIniziale.cube[1][-1][1]
-  cuboIniziale.cube[1][-1][1] = cuboIniziale.cube[1][-1][-1]
-  cuboIniziale.cube[1][-1][-1] = cuboIniziale.cube[-1][-1][-1]
-  cuboIniziale.cube[-1][-1][-1] = cuboIniziale.cube[-1][-1][1]
-  cuboIniziale.cube[-1][-1][1] = appoggio
+  appoggio = self[1][-1][1]
+  self[1][-1][1] = self[1][-1][-1]
+  self[1][-1][-1] = self[-1][-1][-1]
+  self[-1][-1][-1] = self[-1][-1][1]
+  self[-1][-1][1] = appoggio
   --permutazione spigoli
-  appoggio = cuboIniziale.cube[0][-1][1]
-  cuboIniziale.cube[0][-1][1] = cuboIniziale.cube[1][-1][0]
-  cuboIniziale.cube[1][-1][0] = cuboIniziale.cube[0][-1][-1]
-  cuboIniziale.cube[0][-1][-1] = cuboIniziale.cube[-1][-1][0]
-  cuboIniziale.cube[-1][-1][0] = appoggio
+  appoggio = self[0][-1][1]
+  self[0][-1][1] = self[1][-1][0]
+  self[1][-1][0] = self[0][-1][-1]
+  self[0][-1][-1] = self[-1][-1][0]
+  self[-1][-1][0] = appoggio
+  return self
 end
-function mosse.fronteOrario(cuboIniziale) --permutazione fronte orario
+function Cube:fronteOrario() --permutazione fronte orario
   --permutazione angoli
-  appoggio = cuboIniziale.cube[1][1][1]
-  cuboIniziale.cube[1][1][1] = cuboIniziale.cube[1][-1][1]
-  cuboIniziale.cube[1][-1][1] = cuboIniziale.cube[1][-1][-1]
-  cuboIniziale.cube[1][-1][-1] = cuboIniziale.cube[1][1][-1]
-  cuboIniziale.cube[1][1][-1] = appoggio
+  appoggio = self[1][1][1]
+  self[1][1][1] = self[1][-1][1]
+  self[1][-1][1] = self[1][-1][-1]
+  self[1][-1][-1] = self[1][1][-1]
+  self[1][1][-1] = appoggio
   --permutazione spigoli
-  appoggio = cuboIniziale.cube[1][0][1]
-  cuboIniziale.cube[1][0][1] = cuboIniziale.cube[1][-1][0]
-  cuboIniziale.cube[1][-1][0] = cuboIniziale.cube[1][0][-1]
-  cuboIniziale.cube[1][0][-1] = cuboIniziale.cube[1][1][0]
-  cuboIniziale.cube[1][1][0] = appoggio
+  appoggio = self[1][0][1]
+  self[1][0][1] = self[1][-1][0]
+  self[1][-1][0] = self[1][0][-1]
+  self[1][0][-1] = self[1][1][0]
+  self[1][1][0] = appoggio
+  return self
 end
-function mosse.fronteAntiOrario(cuboIniziale) --permutazione fronte orario
+function Cube:fronteAntiOrario() --permutazione fronte orario
   --permutazione angoli
-  appoggio = cuboIniziale.cube[1][1][1]
-  cuboIniziale.cube[1][1][1] = cuboIniziale.cube[1][1][-1]
-  cuboIniziale.cube[1][1][-1] = cuboIniziale.cube[1][-1][-1]
-  cuboIniziale.cube[1][-1][-1] = cuboIniziale.cube[1][-1][1]
-  cuboIniziale.cube[1][-1][1] = appoggio
+  appoggio = self[1][1][1]
+  self[1][1][1] = self[1][1][-1]
+  self[1][1][-1] = self[1][-1][-1]
+  self[1][-1][-1] = self[1][-1][1]
+  self[1][-1][1] = appoggio
   --permutazione spigoli
-  appoggio = cuboIniziale.cube[1][0][1]
-  cuboIniziale.cube[1][0][1] = cuboIniziale.cube[1][1][0]
-  cuboIniziale.cube[1][1][0] = cuboIniziale.cube[1][0][-1]
-  cuboIniziale.cube[1][0][-1] = cuboIniziale.cube[1][-1][0]
-  cuboIniziale.cube[1][-1][0] = appoggio
+  appoggio = self[1][0][1]
+  self[1][0][1] = self[1][1][0]
+  self[1][1][0] = self[1][0][-1]
+  self[1][0][-1] = self[1][-1][0]
+  self[1][-1][0] = appoggio
+  return self
 end
-mosse.upAntiOrario = function(cuboIniziale)
+function Cube:upAntiOrario()
   --Muovo gli angoli
-  appoggio = cuboIniziale.cube[1][-1][1]
-  cuboIniziale.cube[1][-1][1] = cuboIniziale.cube[-1][-1][1]
-  cuboIniziale.cube[-1][-1][1] = cuboIniziale.cube[-1][1][1]
-  cuboIniziale.cube[-1][1][1] = cuboIniziale.cube[1][1][1]
-  cuboIniziale.cube[1][1][1] = appoggio
+  appoggio = self[1][-1][1]
+  self[1][-1][1] = self[-1][-1][1]
+  self[-1][-1][1] = self[-1][1][1]
+  self[-1][1][1] = self[1][1][1]
+  self[1][1][1] = appoggio
   --Muovo gli spigoli
-  appoggio = cuboIniziale.cube[1][0][1]
-  cuboIniziale.cube[1][0][1] = cuboIniziale.cube[0][-1][1]
-  cuboIniziale.cube[0][-1][1] = cuboIniziale.cube[-1][0][1]
-  cuboIniziale.cube[-1][0][1] = cuboIniziale.cube[0][1][1]
-  cuboIniziale.cube[0][1][1] = appoggio
+  appoggio = self[1][0][1]
+  self[1][0][1] = self[0][-1][1]
+  self[0][-1][1] = self[-1][0][1]
+  self[-1][0][1] = self[0][1][1]
+  self[0][1][1] = appoggio
+  return self
 end
-mosse.upOrario = function(cuboIniziale)
+function Cube:upOrario()
   --Muovo gli angoli
-  appoggio = cuboIniziale.cube[1][-1][1]
-  cuboIniziale.cube[1][-1][1] = cuboIniziale.cube[1][1][1]
-  cuboIniziale.cube[1][1][1] = cuboIniziale.cube[-1][1][1]
-  cuboIniziale.cube[-1][1][1] = cuboIniziale.cube[-1][-1][1]
-  cuboIniziale.cube[-1][-1][1] = appoggio
+  appoggio = self[1][-1][1]
+  self[1][-1][1] = self[1][1][1]
+  self[1][1][1] = self[-1][1][1]
+  self[-1][1][1] = self[-1][-1][1]
+  self[-1][-1][1] = appoggio
   --Muovo gli spigoli
-  appoggio = cuboIniziale.cube[1][0][1]
-  cuboIniziale.cube[1][0][1] = cuboIniziale.cube[0][1][1]
-  cuboIniziale.cube[0][1][1] = cuboIniziale.cube[-1][0][1]
-  cuboIniziale.cube[-1][0][1] = cuboIniziale.cube[0][-1][1]
-  cuboIniziale.cube[0][-1][1] = appoggio
+  appoggio = self[1][0][1]
+  self[1][0][1] = self[0][1][1]
+  self[0][1][1] = self[-1][0][1]
+  self[-1][0][1] = self[0][-1][1]
+  self[0][-1][1] = appoggio
+  return self
 end
-mosse.downOrario = function(cuboIniziale)
-  appoggio = cuboIniziale.cube[1][-1][-1]
-  cuboIniziale.cube[1][-1][-1] = cuboIniziale.cube[-1][-1][-1]
-  cuboIniziale.cube[-1][-1][-1] = cuboIniziale.cube[-1][1][-1]
-  cuboIniziale.cube[-1][1][-1] = cuboIniziale.cube[1][1][-1]
-  cuboIniziale.cube[1][1][-1] = appoggio
+function Cube:downOrario()
+  appoggio = self[1][-1][-1]
+  self[1][-1][-1] = self[-1][-1][-1]
+  self[-1][-1][-1] = self[-1][1][-1]
+  self[-1][1][-1] = self[1][1][-1]
+  self[1][1][-1] = appoggio
 
-  appoggio = cuboIniziale.cube[1][0][-1]
-  cuboIniziale.cube[1][0][-1] = cuboIniziale.cube[0][-1][-1]
-  cuboIniziale.cube[0][-1][-1] = cuboIniziale.cube[-1][0][-1]
-  cuboIniziale.cube[-1][0][-1] = cuboIniziale.cube[0][1][-1]
-  cuboIniziale.cube[0][1][-1] = appoggio
+  appoggio = self[1][0][-1]
+  self[1][0][-1] = self[0][-1][-1]
+  self[0][-1][-1] = self[-1][0][-1]
+  self[-1][0][-1] = self[0][1][-1]
+  self[0][1][-1] = appoggio
+  return self
 end
-mosse.downAntiOrario = function(cuboIniziale)
-  appoggio = cuboIniziale.cube[1][-1][-1]
-  cuboIniziale.cube[1][-1][-1] = cuboIniziale.cube[1][1][-1]
-  cuboIniziale.cube[1][1][-1] = cuboIniziale.cube[-1][1][-1]
-  cuboIniziale.cube[-1][1][-1] = cuboIniziale.cube[-1][-1][-1]
-  cuboIniziale.cube[-1][-1][-1] = appoggio
+function Cube:downAntiOrario()
+  appoggio = self[1][-1][-1]
+  self[1][-1][-1] = self[1][1][-1]
+  self[1][1][-1] = self[-1][1][-1]
+  self[-1][1][-1] = self[-1][-1][-1]
+  self[-1][-1][-1] = appoggio
 
-  appoggio = cuboIniziale.cube[1][0][-1]
-  cuboIniziale.cube[1][0][-1] = cuboIniziale.cube[0][1][-1]
-  cuboIniziale.cube[0][1][-1] = cuboIniziale.cube[-1][0][-1]
-  cuboIniziale.cube[-1][0][-1] = cuboIniziale.cube[0][-1][-1]
-  cuboIniziale.cube[0][-1][-1] = appoggio
+  appoggio = self[1][0][-1]
+  self[1][0][-1] = self[0][1][-1]
+  self[0][1][-1] = self[-1][0][-1]
+  self[-1][0][-1] = self[0][-1][-1]
+  self[0][-1][-1] = appoggio
+  return self
 end
-mosse.backOrario = function(cuboIniziale)
-  appoggio = cuboIniziale.cube[-1][1][1]
-  cuboIniziale.cube[-1][1][1] = cuboIniziale.cube[-1][1][-1]
-  cuboIniziale.cube[-1][1][-1] = cuboIniziale.cube[-1][-1][-1]
-  cuboIniziale.cube[-1][-1][-1] = cuboIniziale.cube[-1][-1][1]
-  cuboIniziale.cube[-1][-1][1] = appoggio
+function Cube:backOrario()
+  appoggio = self[-1][1][1]
+  self[-1][1][1] = self[-1][1][-1]
+  self[-1][1][-1] = self[-1][-1][-1]
+  self[-1][-1][-1] = self[-1][-1][1]
+  self[-1][-1][1] = appoggio
 
-  appoggio = cuboIniziale.cube[-1][0][1]
-  cuboIniziale.cube[-1][0][1] = cuboIniziale.cube[-1][1][0]
-  cuboIniziale.cube[-1][1][0] = cuboIniziale.cube[-1][0][-1]
-  cuboIniziale.cube[-1][0][-1] = cuboIniziale.cube[-1][-1][0]
-  cuboIniziale.cube[-1][-1][0] = appoggio
+  appoggio = self[-1][0][1]
+  self[-1][0][1] = self[-1][1][0]
+  self[-1][1][0] = self[-1][0][-1]
+  self[-1][0][-1] = self[-1][-1][0]
+  self[-1][-1][0] = appoggio
+  return self
 end
-mosse.backAntiOrario = function(cuboIniziale)
-  appoggio = cuboIniziale.cube[-1][1][1]
-  cuboIniziale.cube[-1][1][1] = cuboIniziale.cube[-1][-1][1]
-  cuboIniziale.cube[-1][-1][1] = cuboIniziale.cube[-1][-1][-1]
-  cuboIniziale.cube[-1][-1][-1] = cuboIniziale.cube[-1][1][-1]
-  cuboIniziale.cube[-1][-1][-1] = appoggio
+function Cube:backAntiOrario()
+  appoggio = self[-1][1][1]
+  self[-1][1][1] = self[-1][-1][1]
+  self[-1][-1][1] = self[-1][-1][-1]
+  self[-1][-1][-1] = self[-1][1][-1]
+  self[-1][-1][-1] = appoggio
 
-  appoggio = cuboIniziale.cube[-1][0][1]
-  cuboIniziale.cube[-1][0][1] = cuboIniziale.cube[-1][-1][0]
-  cuboIniziale.cube[-1][-1][0] = cuboIniziale.cube[-1][0][-1]
-  cuboIniziale.cube[-1][0][-1] = cuboIniziale.cube[-1][1][0]
-  cuboIniziale.cube[-1][1][0] = appoggio
+  appoggio = self[-1][0][1]
+  self[-1][0][1] = self[-1][-1][0]
+  self[-1][-1][0] = self[-1][0][-1]
+  self[-1][0][-1] = self[-1][1][0]
+  self[-1][1][0] = appoggio
+  return self
 end
 
 ------------------------------------------------------------
@@ -367,23 +416,23 @@ function manhattanDistance(Cube)
   for i = -1, 1 do
     for j = -1, 1 do
       for k = -1, 1 do
-      --  io.write(cuboIniziale.cube[i][j][k], "---------> ")
-        x1 = findIndexX(Cube.cube[i][j][k],Cube)
-        y1 = findIndexY(Cube.cube[i][j][k],Cube)
-        z1 = findIndexZ(Cube.cube[i][j][k],Cube)
-       -- io.write("[X1:", x1, " Y1:", y1, " Z1:", z1, "]")
-        x2 = findIndexX(cuboFinale.cube[i][j][k],cuboFinale)
-        y2 = findIndexY(cuboFinale.cube[i][j][k],cuboFinale)
-        z2 = findIndexZ(cuboFinale.cube[i][j][k],cuboFinale)
-    --    io.write("[X2:", x2, "Y2:", y2, "Z2:", z2, "]")
+        --  io.write(cuboIniziale[i][j][k], "---------> ")
+        x1 = findIndexX(Cube[i][j][k], Cube)
+        y1 = findIndexY(Cube[i][j][k], Cube)
+        z1 = findIndexZ(Cube[i][j][k], Cube)
+        -- io.write("[X1:", x1, " Y1:", y1, " Z1:", z1, "]")
+        x2 = findIndexX(cuboFinale[i][j][k], cuboFinale)
+        y2 = findIndexY(cuboFinale[i][j][k], cuboFinale)
+        z2 = findIndexZ(cuboFinale[i][j][k], cuboFinale)
+        --    io.write("[X2:", x2, "Y2:", y2, "Z2:", z2, "]")
         -- print(x2)
         x = math.abs(x1 - x2)
         --math.abs(x)
         y = math.abs(y1 - y2)
         z = math.abs(z1 - z2)
         sum = sum + (x + y + z)
-      --  io.write("X:", x, " Y:", y, " Z:", z)
-       -- io.write(" somma ", sum, "\n")
+        --  io.write("X:", x, " Y:", y, " Z:", z)
+        -- io.write(" somma ", sum, "\n")
       end
     end
   end
@@ -396,14 +445,14 @@ function printCube(Cube)
     for j = -1, 1 do
       for z = -1, 1 do
         io.write("x:", i, "y:", j, "z:", z, " ------")
-        print(Cube.cube[i][j][z])
+        print(Cube[i][j][z])
       end
     end
   end
 end
 
-io.write("somma totale:  ", manhattanDistance(cuboIniziale),"\n")
---cuboIniziale.printCube(cuboFinale.cube)
+--io.write("somma totale:  ", manhattanDistance(cuboIniziale),"\n")
+--cuboIniziale.printCube(cuboFinale)
 
 ---------------------------------------------------------------
 
@@ -424,7 +473,7 @@ local cachedPaths = nil
 
 function lowest_f_score(set, f_score)
   local lowest, bestConfiguration = INF, nil
-  for  _, configuration in ipairs(set) do
+  for _, configuration in ipairs(set) do
     local score = f_score[configuration]
     if score < lowest then
       lowest, bestConfiguration = score, configuration
@@ -433,11 +482,9 @@ function lowest_f_score(set, f_score)
   return bestConfiguration
 end
 
-
-
 function not_in(set, cuboCorrente)
   for _, cubo in ipairs(set) do
-    if control(cubo,cuboCorrente) then
+    if control(cubo, cuboCorrente) then
       return false
     end
   end
@@ -445,8 +492,8 @@ function not_in(set, cuboCorrente)
 end
 
 function remove_cube(set, cuboCorrente)
-  for i, cube in ipairs(set) do
-    if cube == cuboCorrente then
+  for i, cubo in ipairs(set) do
+    if control(cubo, cuboCorrente) then
       set[i] = set[#set]
       set[#set] = nil
       break
@@ -467,45 +514,43 @@ end
 -- pathfinding functions
 ----------------------------------------------------------------
 
-function a_star(start, goal, moves)
+function a_star(start, goal)
   local closedset = {}
   local openset = {start}
   local came_from = {}
-local moves=moves
+  local count = 0
   local g_score, f_score = {}, {}
   g_score[start] = 0
   f_score[start] = g_score[start] + manhattanDistance(start)
-  print("passo effettuato")
-  io.write("dimensione openset: ",#openset)
+
+  
   while #openset > 0 do
+
     local current = lowest_f_score(openset, f_score)
-    --printCube(current)
-    --printCube(goal)
-    if control(current,goal) then
+    count=count+1--numeri mosse
+    printCube(current)
+    if control(current, goal) then
       local path = unwind_path({}, came_from, goal)
       table.insert(path, goal)
+      io.write("numero mosse: ",count)
       return path
     end
 
-    remove_move(openset, current)
+    remove_cube(openset, current)
     table.insert(closedset, current)
-
-    
-    for _, move in ipairs(moves) do
-
+    local cubi=current:mosse()
+    for _, cubo in ipairs(cubi) do
       -- crea un nuovo cubo, fa la copia della configurazione iniziale ed esegue la mossa
-  
-      pippo=Cube:create()
-      pippo.cube=start.cube
-      move(pippo)
-      if not_in(closedset, pippo) then
-        local tentative_g_score = g_score[current]
-        if not_in(openset, pippo) or tentative_g_score < g_score[pippo] then
-          came_from[pippo] = current
-          g_score[pippo] = tentative_g_score
-          f_score[pippo] = g_score[pippo] + manhattanDistance(pippo)
-          if not_in(openset, pippo) then
-            table.insert(openset, pippo)
+      
+      if not_in(closedset, cubo) then
+        local tentative_g_score = g_score[current] 
+        if not_in(openset, cubo)  then
+          came_from[cubo] = current
+          g_score[cubo] = tentative_g_score +1 
+          f_score[cubo] = g_score[cubo] + manhattanDistance(cubo)
+          print(f_score[cubo])
+          if not_in(openset, cubo) then
+            table.insert(openset, cubo)
           end
         end
       end
@@ -540,21 +585,20 @@ function path(start, goal, moves, ignore_cache)
   return resPath
 end
 
-printCube(cuboIniziale)
-printCube(cuboFinale)
+--printCube(cuboIniziale)
+--printCube(cuboFinale)
 cuboIniziale:destraOrario()
---cuboFinale:mossaEsempio(mosse.destraOrario)
---mosse.destraOrario(cuboIniziale)
---mosse.sinistraAntiOrario(cuboIniziale)
-printCube(cuboIniziale)
-printCube(cuboFinale)
-local path = path(cuboIniziale, cuboFinale, mosse, true)
+cuboIniziale:destraOrario()
+
+--cuboIniziale:sinistraOrario()
+local path = path(cuboIniziale, cuboFinale, true)
+
 
 if not path then
   print("No valid path found")
 else
   for i, node in ipairs(path) do
     --printCube(node)
-    print(i)
+    --print(i)
   end
 end
