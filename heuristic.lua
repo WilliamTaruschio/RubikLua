@@ -150,33 +150,33 @@ end
 --Metodi per trovare gli indici X Y Z
 --------------------------------------------------------
 
-function findIndexX(nome, Cube)
+function Cube:findIndexX(nome)
   for i = -1, 1 do
     for j = -1, 1 do
       for z = -1, 1 do
-        if (Cube[i][j][z] == nome) then
+        if (self[i][j][z] == nome) then
           return i
         end
       end
     end
   end
 end
-function findIndexY(nome, Cube)
+function Cube:findIndexY(nome)
   for i = -1, 1 do
     for j = -1, 1 do
       for z = -1, 1 do
-        if (Cube[i][j][z] == nome) then
+        if (self[i][j][z] == nome) then
           return j
         end
       end
     end
   end
 end
-function findIndexZ(nome, Cube)
+function Cube:findIndexZ(nome)
   for i = -1, 1 do
     for j = -1, 1 do
       for z = -1, 1 do
-        if (Cube[i][j][z] == nome) then
+        if (self[i][j][z] == nome) then
           return z
         end
       end
@@ -238,7 +238,6 @@ function Cube:destraOrario() --permutazione destra orario
   self[1][1][0] = self[0][1][-1]
   self[0][1][-1] = self[-1][1][0]
   self[-1][1][0] = appoggio
-  print("mossa")
   return self
 end
 
@@ -411,32 +410,32 @@ end
 -----------------------------------------------------------
 
 -- euristica per calcolare la distanza
-function manhattanDistance(Cube)
+function Cube:manhattanDistance()
   sum = 0
-  for i = -1, 1 do
+   for i = -1, 1 do
     for j = -1, 1 do
       for k = -1, 1 do
-        --  io.write(cuboIniziale[i][j][k], "---------> ")
-        x1 = findIndexX(Cube[i][j][k], Cube)
-        y1 = findIndexY(Cube[i][j][k], Cube)
-        z1 = findIndexZ(Cube[i][j][k], Cube)
-        -- io.write("[X1:", x1, " Y1:", y1, " Z1:", z1, "]")
-        x2 = findIndexX(cuboFinale[i][j][k], cuboFinale)
-        y2 = findIndexY(cuboFinale[i][j][k], cuboFinale)
-        z2 = findIndexZ(cuboFinale[i][j][k], cuboFinale)
-        --    io.write("[X2:", x2, "Y2:", y2, "Z2:", z2, "]")
-        -- print(x2)
+      
+        local x1 = self:findIndexX(self[i][j][k])
+        local y1 = self:findIndexY(self[i][j][k])
+       local  z1 = self:findIndexZ(self[i][j][k])
+        
+        local x2 = cuboFinale:findIndexX(self[i][j][k])
+        local y2 = cuboFinale:findIndexY(self[i][j][k])
+        local z2 = cuboFinale:findIndexZ(self[i][j][k])
+       
+        
         x = math.abs(x1 - x2)
-        --math.abs(x)
+        
         y = math.abs(y1 - y2)
         z = math.abs(z1 - z2)
         sum = sum + (x + y + z)
-        --  io.write("X:", x, " Y:", y, " Z:", z)
-        -- io.write(" somma ", sum, "\n")
+        
       end
     end
   end
-  return sum / 8
+  print(sum/8.0)
+  return sum / 8.0
 end
 
 function printCube(Cube)
@@ -515,24 +514,31 @@ end
 ----------------------------------------------------------------
 
 function a_star(start, goal)
+  local percorso={}
+   local tabellaAlbero={}
   local closedset = {}
   local openset = {start}
   local came_from = {}
-  local count = 0
+  count = 0
   local g_score, f_score = {}, {}
   g_score[start] = 0
-  f_score[start] = g_score[start] + manhattanDistance(start)
-
+  f_score[start] = g_score[start] + start:manhattanDistance()
+tabellaAlbero[start]=0
   
   while #openset > 0 do
 
     local current = lowest_f_score(openset, f_score)
-    count=count+1--numeri mosse
-    printCube(current)
+    table.insert( percorso,current )
+    
     if control(current, goal) then
+     
       local path = unwind_path({}, came_from, goal)
       table.insert(path, goal)
-      io.write("numero mosse: ",count)
+      
+      for _, occorrenza in ipairs(percorso) do
+      io.write("indice:  ",tabellaAlbero[occorrenza],"  punteggio:  ",f_score[occorrenza],"\n")
+    
+      end
       return path
     end
 
@@ -540,15 +546,16 @@ function a_star(start, goal)
     table.insert(closedset, current)
     local cubi=current:mosse()
     for _, cubo in ipairs(cubi) do
+      count=count+1
       -- crea un nuovo cubo, fa la copia della configurazione iniziale ed esegue la mossa
-      
+      tabellaAlbero[cubo]=count
       if not_in(closedset, cubo) then
         local tentative_g_score = g_score[current] 
         if not_in(openset, cubo)  then
           came_from[cubo] = current
           g_score[cubo] = tentative_g_score +1 
-          f_score[cubo] = g_score[cubo] + manhattanDistance(cubo)
-          print(f_score[cubo])
+          f_score[cubo] = g_score[cubo] + cubo:manhattanDistance()
+         --print(f_score[cubo])
           if not_in(openset, cubo) then
             table.insert(openset, cubo)
           end
@@ -588,7 +595,6 @@ end
 --printCube(cuboIniziale)
 --printCube(cuboFinale)
 cuboIniziale:destraOrario()
-cuboIniziale:destraOrario()
 
 --cuboIniziale:sinistraOrario()
 local path = path(cuboIniziale, cuboFinale, true)
@@ -598,7 +604,6 @@ if not path then
   print("No valid path found")
 else
   for i, node in ipairs(path) do
-    --printCube(node)
-    --print(i)
+   printCube(node)
   end
 end
